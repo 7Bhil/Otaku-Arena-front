@@ -2,13 +2,15 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
-import { Zap, Play, Trophy, Brain, X, CheckCircle, AlertCircle, ChevronRight } from "lucide-react";
+import { Zap, Play, Trophy, Brain, X, CheckCircle, AlertCircle, ChevronRight, Shield } from "lucide-react";
 
 export default function Quizzes() {
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeSession, setActiveSession] = useState(null);
   const [resumableSession, setResumableSession] = useState(null);
+  const [roadmap, setRoadmap] = useState([]);
+  const [showConfirm, setShowConfirm] = useState(false);
   const { user, openLogin } = useAuth();
   useEffect(() => {
     fetch("/api/quizzes")
@@ -25,6 +27,9 @@ export default function Quizzes() {
         const progress = JSON.parse(saved);
         if (progress.userId === user?.id || progress.userId === user?.username) {
            setResumableSession(progress);
+           if (progress.sessionData?.roadmap) {
+             setRoadmap(progress.sessionData.roadmap);
+           }
         }
       } catch (e) {
         localStorage.removeItem("otaku_quiz_progress");
@@ -32,16 +37,27 @@ export default function Quizzes() {
     }
   }, [user]);
 
-  const startGlobalChallenge = async () => {
+  const startGlobalChallenge = async (force = false) => {
     if (!user) {
       openLogin();
       return;
     }
+
+    if (resumableSession && !force) {
+      setShowConfirm(true);
+      return;
+    }
+
+    setShowConfirm(false);
     setLoading(true);
     try {
       const res = await fetch("/api/quizzes/session");
       const data = await res.json();
       setActiveSession(data);
+      setRoadmap(data.roadmap || []);
+      // Nettoyer l'ancienne progression si on force un nouveau parcours
+      localStorage.removeItem("otaku_quiz_progress");
+      setResumableSession(null);
     } catch (e) {
       console.error(e);
     }
@@ -87,29 +103,95 @@ export default function Quizzes() {
                 Affrontez l&apos;Arène avec une session intense de **30 questions aléatoires** sur les 100 meilleures franchises. Saurez-vous atteindre le score parfait ?
               </p>
               
-              <div className="flex flex-wrap gap-4 justify-center md:justify-start pt-4">
-                <button 
-                  onClick={startGlobalChallenge}
-                  className="bg-primary hover:bg-primary/90 text-white font-black py-5 px-12 rounded-2xl shadow-2xl shadow-primary/40 transition-all flex items-center gap-4 italic uppercase text-sm tracking-[0.2em] hover:scale-105 active:scale-95"
-                >
-                  Lancer le Défi (30 Questions) <Play className="size-5 fill-white" />
-                </button>
-                {resumableSession && (
+                <div className="flex flex-wrap gap-4 justify-center md:justify-start pt-4">
                   <button 
-                    onClick={() => {
-                      setActiveSession({
-                        ...resumableSession.sessionData,
-                        initialStep: resumableSession.currentStep,
-                        initialScore: resumableSession.score
-                      });
-                      setResumableSession(null);
-                    }}
-                    className="bg-orange-500 hover:bg-orange-600 text-white font-black py-5 px-12 rounded-2xl shadow-2xl shadow-orange-500/40 transition-all flex items-center gap-4 italic uppercase text-sm tracking-[0.2em] hover:scale-105 active:scale-95 border border-orange-400/30"
+                    onClick={() => startGlobalChallenge(false)}
+                    className="bg-primary hover:bg-primary/90 text-white font-black py-5 px-12 rounded-2xl shadow-2xl shadow-primary/40 transition-all flex items-center gap-4 italic uppercase text-sm tracking-[0.2em] hover:scale-105 active:scale-95"
                   >
-                    Reprendre ({resumableSession.currentStep + 1}/{resumableSession.sessionData.questions.length}) <ChevronRight className="size-5" />
+                    Nouveau Parcours (30 Q) <Play className="size-5 fill-white" />
                   </button>
+                  {resumableSession && (
+                    <button 
+                      onClick={() => {
+                        setActiveSession({
+                          ...resumableSession.sessionData,
+                          initialStep: resumableSession.currentStep,
+                          initialScore: resumableSession.score
+                        });
+                        setRoadmap(resumableSession.sessionData?.roadmap || []);
+                        setResumableSession(null);
+                      }}
+                      className="bg-orange-500 hover:bg-orange-600 text-white font-black py-5 px-12 rounded-2xl shadow-2xl shadow-orange-500/40 transition-all flex items-center gap-4 italic uppercase text-sm tracking-[0.2em] hover:scale-105 active:scale-95 border border-orange-400/30"
+                    >
+                      Continuer le Parcours ({resumableSession.currentStep + 1}/{resumableSession.sessionData.questions.length}) <ChevronRight className="size-5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Confirm Dialog */}
+                {showConfirm && (
+                   <motion.div 
+                     initial={{ opacity: 0, y: 10 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     className="mt-6 p-6 rounded-3xl bg-red-500/10 border border-red-500/20 flex flex-col md:flex-row items-center justify-between gap-6"
+                   >
+                     <div className="flex items-center gap-4">
+                        <div className="size-10 rounded-xl bg-red-500/20 flex items-center justify-center text-red-500">
+                           <AlertCircle className="size-5" />
+                        </div>
+                        <div className="text-left">
+                           <p className="text-white font-black uppercase italic text-xs">Parcours en cours détecté</p>
+                           <p className="text-[10px] text-slate-400 font-bold">Voulez-vous abandonner votre progression actuelle ?</p>
+                        </div>
+                     </div>
+                     <div className="flex gap-3">
+                        <button 
+                          onClick={() => setShowConfirm(false)}
+                          className="px-6 py-3 rounded-xl bg-white/5 text-[10px] font-black uppercase text-slate-400 hover:text-white transition-colors"
+                        >
+                          Annuler
+                        </button>
+                        <button 
+                          onClick={() => startGlobalChallenge(true)}
+                          className="px-6 py-3 rounded-xl bg-red-500 text-[10px] font-black uppercase text-white hover:bg-red-600 transition-colors"
+                        >
+                          Abandonner & Recommencer
+                        </button>
+                     </div>
+                   </motion.div>
                 )}
-              </div>
+
+                {/* Roadmap Visualizer */}
+                {roadmap.length > 0 && !activeSession && (
+                  <div className="pt-8 space-y-4">
+                    <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest block">Votre Parcours Actuel</span>
+                    <div className="flex items-center gap-3 overflow-x-auto pb-4 scrollbar-hide">
+                      {roadmap.map((item, idx) => {
+                        const isResumable = resumableSession;
+                        const currentGlobalStep = isResumable ? resumableSession.currentStep : 0;
+                        
+                        // Calculer si l'anime est complété
+                        let accumulated = 0;
+                        let isCompleted = false;
+                        let isCurrent = false;
+                        
+                        for (let i = 0; i < idx; i++) accumulated += roadmap[i].questionCount;
+                        if (currentGlobalStep >= accumulated + roadmap[idx].questionCount) isCompleted = true;
+                        if (currentGlobalStep >= accumulated && currentGlobalStep < accumulated + roadmap[idx].questionCount) isCurrent = true;
+
+                        return (
+                          <div key={idx} className="flex items-center gap-3 shrink-0">
+                            <div className={`px-4 py-2.5 rounded-xl border flex items-center gap-3 transition-all ${isCompleted ? 'bg-green-500/10 border-green-500/50 text-green-500' : (isCurrent ? 'bg-primary/20 border-primary text-primary shadow-lg shadow-primary/20' : 'bg-white/5 border-white/5 text-slate-500')}`}>
+                              {isCompleted ? <CheckCircle className="size-3.5" /> : <div className="size-2 rounded-full bg-current opacity-50" />}
+                              <span className="text-[10px] font-black uppercase italic tracking-wider whitespace-nowrap">{item.title}</span>
+                            </div>
+                            {idx < roadmap.length - 1 && <div className="w-4 h-px bg-white/10" />}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
             </div>
 
             <div className="relative z-10 flex flex-col items-center gap-4 bg-white/5 p-10 rounded-[40px] border border-white/10 backdrop-blur-sm">
@@ -123,41 +205,9 @@ export default function Quizzes() {
             </div>
           </motion.div>
 
-          {/* Individual Quizzes Section */}
-          <div className="space-y-8">
-            <h2 className="text-2xl font-black text-white italic uppercase tracking-widest flex items-center gap-4">
-              <Brain className="size-6 text-primary" /> Entraînement par Franchise
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              <AnimatePresence mode="wait">
-                {loading ? (
-                  <motion.div key="loading" className="col-span-full py-20 text-center flex flex-col items-center gap-6">
-                    <div className="size-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-                  </motion.div>
-                ) : (
-                  quizzes.slice(0, 16).map((quiz, idx) => (
-                    <motion.div 
-                      key={quiz.id}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: idx * 0.02 }}
-                      className="group glass-card rounded-3xl p-6 border-white/5 hover:border-primary/40 transition-all cursor-pointer flex items-center justify-between"
-                      onClick={() => startIndividualQuiz(quiz.id)}
-                    >
-                      <div className="flex flex-col gap-1 min-w-0">
-                        <h3 className="text-sm font-black text-white truncate uppercase italic tracking-tight">{quiz.title}</h3>
-                        <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest flex items-center gap-1">
-                          {quiz.difficulty} • +{quiz.xpReward} XP
-                        </span>
-                      </div>
-                      <div className="size-8 rounded-lg bg-white/5 flex items-center justify-center text-slate-500 group-hover:bg-primary group-hover:text-white transition-all">
-                        <Play className="size-3 fill-current" />
-                      </div>
-                    </motion.div>
-                  ))
-                )}
-              </AnimatePresence>
-            </div>
+          {/* Global Challenge Roadmap is now the only way to play */}
+          <div className="mt-20">
+            {/* Si on veut rajouter des infos ou des stats ici plus tard */}
           </div>
         </div>
       </div>
@@ -268,17 +318,14 @@ function QuizPlayer({ sessionData, user, onClose, onComplete, initialStep = 0, i
     >
       <div className="max-w-2xl w-full glass-card rounded-[40px] p-8 md:p-12 relative border-white/10 shadow-3xl">
         <button 
-          onClick={async () => {
-             if (score > 0 && !isFinished) {
-               // Sauvegarder ce qu'on a fait avant de partir
-               await submitResult(accumulatedScore.current);
-             }
-             localStorage.removeItem("otaku_quiz_progress");
+          onClick={() => {
+             // On ne supprime PLUS le progrès ici. 
+             // On permet de quitter et de revenir plus tard.
              onClose();
           }} 
           className="absolute top-8 right-8 text-white/20 hover:text-white transition-colors flex items-center gap-2 group"
         >
-          <span className="text-[10px] uppercase font-black tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Quitter</span>
+          <span className="text-[10px] uppercase font-black tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Conserver & Quitter</span>
           <X className="size-6" />
         </button>
 
@@ -289,8 +336,8 @@ function QuizPlayer({ sessionData, user, onClose, onComplete, initialStep = 0, i
                 <Brain className="size-3" /> Question {currentStep + 1} / {sessionData.questions.length}
               </div>
               {sessionData.questions[currentStep].animeTitle && (
-                <div className="text-slate-500 italic max-w-[200px] truncate text-right">
-                  Catégorie: {sessionData.questions[currentStep].animeTitle}
+                <div className="text-white bg-primary/20 px-3 py-1.5 rounded-lg border border-primary/30 italic flex items-center gap-2 max-w-[250px]">
+                  <Zap className="size-3 fill-primary" /> {sessionData.questions[currentStep].animeTitle}
                 </div>
               )}
             </div>

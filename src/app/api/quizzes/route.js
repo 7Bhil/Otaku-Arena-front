@@ -36,7 +36,7 @@ export async function POST(req) {
     let xpReward = 100;
 
     let finalQuizId = quizId;
-    if (quizId.startsWith('session-')) {
+    if (quizId.startsWith('session-') || quizId.startsWith('journey-')) {
       xpReward = 500;
       // Créer le quiz virtuel s'il n'existe pas
       await prisma.quiz.upsert({

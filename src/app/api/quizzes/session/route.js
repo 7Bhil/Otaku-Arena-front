@@ -8,27 +8,40 @@ export async function GET() {
     const fileData = fs.readFileSync(filePath, 'utf8');
     const allQuizBundles = JSON.parse(fileData);
     
-    // Extraire toutes les questions individuelles
-    let allQuestions = [];
-    allQuizBundles.forEach(bundle => {
-      bundle.questions.forEach(q => {
-        allQuestions.push({
+    // Mélanger les bundles et en prendre 5 pour le parcours
+    const selectedBundles = allQuizBundles
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 5);
+
+    let sessionQuestions = [];
+    let roadmap = [];
+
+    selectedBundles.forEach(bundle => {
+      // Pour chaque bundle, prendre 6 questions (ou toutes si moins de 6)
+      const bundleQuestions = bundle.questions
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 6)
+        .map(q => ({
           ...q,
           animeTitle: bundle.title,
           quizId: bundle.id
-        });
+        }));
+      
+      sessionQuestions = [...sessionQuestions, ...bundleQuestions];
+      
+      roadmap.push({
+        id: bundle.id,
+        title: bundle.title,
+        questionCount: bundleQuestions.length
       });
     });
 
-    // Mélanger et prendre 30 questions
-    const shuffled = allQuestions.sort(() => Math.random() - 0.5);
-    const sessionQuestions = shuffled.slice(0, 30);
-
     return NextResponse.json({
-      id: `session-${Date.now()}`,
-      title: "Défi Global Otaku",
+      id: `journey-${Date.now()}`,
+      title: "Parcours Otaku",
       questions: sessionQuestions,
-      xpReward: 500 // Récompense plus haute pour le défi global
+      roadmap: roadmap,
+      xpReward: 500
     });
   } catch (error) {
     console.error('Error creating quiz session:', error);

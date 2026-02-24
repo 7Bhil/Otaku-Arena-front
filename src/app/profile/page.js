@@ -14,7 +14,8 @@ import UserAvatar from "@/components/UserAvatar";
 export default function Profile() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { user: authUser, openLogin } = useAuth();
+  const [journeyProgress, setJourneyProgress] = useState(null);
+  const { user: authUser, logout, openLogin } = useAuth();
 
   const fetchProfile = useCallback(async () => {
     if (!authUser) {
@@ -35,7 +36,20 @@ export default function Profile() {
 
   useEffect(() => {
     fetchProfile();
-  }, [fetchProfile]);
+    
+    // Charger le parcours en cours
+    const saved = localStorage.getItem("otaku_quiz_progress");
+    if (saved) {
+      try {
+        const progress = JSON.parse(saved);
+        if (progress.userId === authUser?.id || progress.userId === authUser?.username) {
+          setJourneyProgress(progress);
+        }
+      } catch (e) {
+        console.error("Failed to parse journey progress", e);
+      }
+    }
+  }, [fetchProfile, authUser]);
 
   if (loading && !user) {
     return (
@@ -228,6 +242,46 @@ export default function Profile() {
                 ))}
               </div>
             </motion.div>
+
+            {journeyProgress && (
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="glass-card rounded-[32px] p-8 border-primary/20 shadow-[0_20px_40px_-15px_rgba(140,43,238,0.2)] bg-primary/5 flex flex-col gap-6"
+              >
+                <div className="flex justify-between items-center">
+                   <h3 className="text-white font-black uppercase italic tracking-[0.2em] text-[10px] flex items-center gap-3">
+                     <Zap className="size-4 text-primary fill-primary" /> Défi Global en Cours
+                   </h3>
+                   <span className="text-[10px] font-black text-primary italic">{Math.round((journeyProgress.currentStep / (journeyProgress.sessionData?.questions?.length || 1)) * 100)}%</span>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-primary" 
+                      style={{ width: `${(journeyProgress.currentStep / (journeyProgress.sessionData?.questions?.length || 1)) * 100}%` }}
+                    ></div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="size-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary border border-primary/20">
+                      <Play className="size-4 fill-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-[10px] font-black text-white uppercase italic truncate">{(journeyProgress.sessionData?.questions?.[journeyProgress.currentStep]?.animeTitle) || "En cours..."}</p>
+                      <p className="text-[8px] text-slate-500 font-bold uppercase tracking-widest">Question {journeyProgress.currentStep + 1} / {journeyProgress.sessionData?.questions?.length || 30}</p>
+                    </div>
+                  </div>
+                  <Link 
+                    href="/quizzes"
+                    className="w-full py-4 rounded-xl bg-primary text-white font-black italic uppercase text-[9px] tracking-[0.2em] flex items-center justify-center gap-2 hover:bg-primary/90 transition-all"
+                  >
+                    CONTINUER <ChevronRight className="size-3" />
+                  </Link>
+                </div>
+              </motion.div>
+            )}
           </div>
 
           {/* Activity Column */}

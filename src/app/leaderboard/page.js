@@ -70,9 +70,14 @@ export default function Leaderboard() {
       const res = await fetch(endpoint);
       const result = await res.json();
       
-      leaderboardCache[activeTab] = result;
-      leaderboardCache.lastFetched[activeTab] = now;
-      setData(result);
+      if (Array.isArray(result)) {
+        leaderboardCache[activeTab] = result;
+        leaderboardCache.lastFetched[activeTab] = now;
+        setData(result);
+      } else {
+        console.error("API did not return an array:", result);
+        setData([]);
+      }
     } catch (error) {
       console.error("Failed to fetch data:", error);
     }
@@ -83,10 +88,10 @@ export default function Leaderboard() {
     fetchData(true);
   }, [fetchData]);
 
-  const filteredData = data.filter(item => {
+  const filteredData = Array.isArray(data) ? data.filter(item => {
     const name = activeTab === 'users' ? (item.username || "") : (item.title || "");
     return name.toLowerCase().includes(searchTerm.toLowerCase());
-  });
+  }) : [];
 
   return (
     <div className="relative pt-32 pb-20 overflow-hidden min-h-screen">
