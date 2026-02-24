@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(cuid())
+  username     String        @unique
+  avatar       String?
+  level        Int           @default(1)
+  xp           Int           @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  badges       Badge[]
+  quizAttempts QuizAttempt[]
+  votes        Vote[]
+
+  @@index([level, xp])
+}
+
+model Anime {
+  id        Int      @id
+  title     String
+  type      String?
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  votes     Vote[]
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  userId    String
+  animeId   Int
+  createdAt DateTime @default(now())
+  anime     Anime    @relation(fields: [animeId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([animeId])
+}
+
+model Quiz {
+  id         String        @id @default(cuid())
+  title      String
+  difficulty String        @default("Moyen")
+  questions  Json
+  xpReward   Int           @default(100)
+  createdAt  DateTime      @default(now())
+  attempts   QuizAttempt[]
+}
+
+model QuizAttempt {
+  id          String   @id @default(cuid())
+  userId      String
+  quizId      String
+  score       Int
+  completedAt DateTime @default(now())
+  quiz        Quiz     @relation(fields: [quizId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model Badge {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  icon        String?
+  userId      String
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+}

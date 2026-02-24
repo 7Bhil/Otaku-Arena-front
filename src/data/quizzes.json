@@ -1,0 +1,167 @@
+[
+  {
+    "id": "quiz-1",
+    "animeId": 1,
+    "title": "One Piece",
+    "difficulty": "Moyen",
+    "xpReward": 100,
+    "questions": [
+      {
+        "question": "Quel est le but ultime de Monkey D. Luffy ?",
+        "options": [
+          "Devenir Hokage",
+          "Trouver le One Piece et devenir le Roi des Pirates",
+          "Devenir le plus grand épéiste",
+          "Venger son frère Ace"
+        ],
+        "answer": 1
+      },
+      {
+        "question": "Quel studio produit l'animé One Piece ?",
+        "options": [
+          "Studio Ghibli",
+          "Toei Animation",
+          "Madhouse",
+          "MAPPA"
+        ],
+        "answer": 1
+      },
+      {
+        "question": "Quel Fruit du Démon Luffy a-t-il mangé ?",
+        "options": [
+          "Mera Mera no Mi",
+          "Gomu Gomu no Mi",
+          "Ope Ope no Mi",
+          "Hito Hito no Mi"
+        ],
+        "answer": 1
+      }
+    ]
+  },
+  {
+    "id": "quiz-2",
+    "animeId": 2,
+    "title": "Naruto",
+    "difficulty": "Facile",
+    "xpReward": 100,
+    "questions": [
+      {
+        "question": "Quel est le rêve de Naruto Uzumaki ?",
+        "options": [
+          "Devenir Hokage",
+          "Maîtriser le Sharingan",
+          "Capturer tous les Bijuus",
+          "Tuer Sasuke Uchiha"
+        ],
+        "answer": 0
+      },
+      {
+        "question": "Comment s'appelle l'esprit scellé à l'intérieur de Naruto ?",
+        "options": [
+          "Shukaku",
+          "Matatabi",
+          "Kurama (Kyubi)",
+          "Gyuki"
+        ],
+        "answer": 2
+      },
+      {
+        "question": "Qui était le premier sensei de Naruto à l'Académie ?",
+        "options": [
+          "Kakashi Hatake",
+          "Jiraiya",
+          "Iruka Umino",
+          "Orochimaru"
+        ],
+        "answer": 2
+      }
+    ]
+  },
+  {
+    "id": "quiz-3",
+    "animeId": 10,
+    "title": "Dragon Ball Z",
+    "difficulty": "Facile",
+    "xpReward": 100,
+    "questions": [
+      {
+        "question": "De quelle race extraterrestre vient Goku ?",
+        "options": [
+          "Namek",
+          "Saiyan",
+          "Kryptonien",
+          "Majin"
+        ],
+        "answer": 1
+      },
+      {
+        "question": "Quelle est la technique signature apprise par Goku auprès de Tortue Géniale ?",
+        "options": [
+          "Rasengan",
+          "Kamehameha",
+          "Final Flash",
+          "Special Beam Cannon"
+        ],
+        "answer": 1
+      }
+    ]
+  },
+  {
+    "id": "quiz-4",
+    "animeId": 16498,
+    "title": "Attack on Titan",
+    "difficulty": "Difficile",
+    "xpReward": 150,
+    "questions": [
+      {
+        "question": "Quel est le nom du protagoniste principal ?",
+        "options": [
+          "Levi Ackerman",
+          "Eren Yeager",
+          "Armin Arlert",
+          "Erwin Smith"
+        ],
+        "answer": 1
+      },
+      {
+        "question": "Quel mur est le premier à être brisé par le Titan Colossal ?",
+        "options": [
+          "Wall Rose",
+          "Wall Sina",
+          "Wall Maria",
+          "Wall Sheena"
+        ],
+        "answer": 2
+      }
+    ]
+  },
+  {
+    "id": "quiz-5",
+    "animeId": 1535,
+    "title": "Death Note",
+    "difficulty": "Moyen",
+    "xpReward": 100,
+    "questions": [
+      {
+        "question": "Comment s'appelle le Dieu de la Mort (Shinigami) qui suit Light ?",
+        "options": [
+          "Rem",
+          "Ryuk",
+          "Sidoh",
+          "Jealous"
+        ],
+        "answer": 1
+      },
+      {
+        "question": "Quel est le véritable nom de L ?",
+        "options": [
+          "Light Yagami",
+          "L Lawliet",
+          "Near",
+          "Mello"
+        ],
+        "answer": 1
+      }
+    ]
+  }
+]
