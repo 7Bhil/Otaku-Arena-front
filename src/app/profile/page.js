@@ -3,13 +3,14 @@ import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Edit3, Share2, BarChart3, Target, Award, Heart, Clock, 
-  Activity, Shield, Zap, Settings, LogOut, ChevronRight,
-  Star, Flame, CheckCircle2, Trophy
+import {
+  Edit3, Share2, BarChart3, Target, Award, Heart, Clock,
+  Trophy, Medal, Flame, Settings, Edit2, Activity, CheckCircle2,
+  ChevronRight, Zap, Play, X, Shield, Star, LogOut
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import UserAvatar from "@/components/UserAvatar";
+import { calculateExpertise, getPrestigeTitle } from "@/lib/expertise";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -17,12 +18,15 @@ export default function Profile() {
   const [journeyProgress, setJourneyProgress] = useState(null);
   const { user: authUser, logout, openLogin } = useAuth();
 
+  const expertiseData = calculateExpertise(user?.quizAttempts, user?.votes);
+  const prestigeTitle = getPrestigeTitle(user?.level, user?.xp, user?._count?.votes);
+
   const fetchProfile = useCallback(async () => {
     if (!authUser) {
       setLoading(false);
       return;
     }
-    
+
     setLoading(true);
     try {
       const res = await fetch(`/api/users/${authUser.id}`);
@@ -36,7 +40,7 @@ export default function Profile() {
 
   useEffect(() => {
     fetchProfile();
-    
+
     // Charger le parcours en cours
     const saved = localStorage.getItem("otaku_quiz_progress");
     if (saved) {
@@ -71,7 +75,7 @@ export default function Profile() {
             <p className="text-slate-500 font-medium">Connectez-vous pour voir votre progression et vos badges.</p>
           </div>
           <div className="flex flex-col gap-4">
-            <button 
+            <button
               onClick={openLogin}
               className="bg-primary text-white font-black py-5 px-8 rounded-xl uppercase tracking-widest text-[10px] italic shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
             >
@@ -92,23 +96,23 @@ export default function Profile() {
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col gap-12">
         {/* Profile Header */}
-        <motion.section 
+        <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="relative h-[400px] rounded-[48px] overflow-hidden group shadow-2xl border border-white/5"
         >
-          <Image 
-            src="https://images.unsplash.com/photo-1614850523296-d8c1af03d400?q=80&w=2070&auto=format&fit=crop" 
-            alt="Cover" 
+          <Image
+            src="https://images.unsplash.com/photo-1614850523296-d8c1af03d400?q=80&w=2070&auto=format&fit=crop"
+            alt="Cover"
             fill
             className="object-cover transition-transform duration-1000 group-hover:scale-105"
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
-          
+
           <div className="absolute bottom-10 left-10 flex flex-col md:flex-row items-end gap-10 w-[calc(100%-80px)] z-10">
              <div className="relative group/avatar">
-               <motion.div 
+               <motion.div
                  whileHover={{ scale: 1.05 }}
                  className="relative size-32 md:size-48 rounded-[40px] border-[8px] border-background overflow-hidden shadow-2xl transition-transform duration-500 flex items-center justify-center bg-slate-800"
                >
@@ -122,8 +126,21 @@ export default function Profile() {
              <div className="flex-1 flex flex-col gap-6 pb-2">
                 <div className="space-y-2">
                   <div className="flex items-center gap-4 flex-wrap">
-                    <h1 className="text-4xl md:text-6xl font-black text-white italic uppercase tracking-tighter">{user?.username || 'VashTheStampede'}</h1>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-3 items-center md:items-start relative">
+                  <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white italic tracking-tighter leading-none text-center md:text-left">
+                    {user?.username || "Otaku"}
+                  </h1>
+                  <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="flex items-center gap-2 group px-3 py-1 rounded-full bg-primary/10 border border-primary/20 cursor-default hover:bg-primary/20 transition-all shadow-[0_0_15px_rgba(140,43,238,0.2)]"
+                  >
+                    <Star className="size-3 text-primary fill-primary" />
+                    <span className="text-[9px] md:text-[10px] font-black text-primary uppercase italic tracking-widest">{prestigeTitle}</span>
+                  </motion.div>
+                </div>
+                <div className="flex gap-8 items-center mt-2">
                       <span className="bg-primary/20 backdrop-blur-md border border-primary/40 text-primary text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-[0.2em] shadow-lg shadow-primary/10">WEEB ASSIDU</span>
                       <span className="bg-white/10 backdrop-blur-md border border-white/10 text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-[0.2em]">LVL {user?.level || 1}</span>
                     </div>
@@ -183,24 +200,76 @@ export default function Profile() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="glass-card rounded-[32px] p-8 flex flex-col gap-10 border-white/5 shadow-2xl"
+              className="glass-card rounded-[32px] p-8 flex flex-col gap-10 border-white/5 shadow-2xl relative overflow-hidden group"
             >
+               <div className="absolute -top-24 -right-24 size-48 bg-primary/20 blur-[80px] group-hover:bg-primary/30 transition-colors"></div>
                <h3 className="text-white font-black uppercase italic tracking-[0.2em] text-[10px] flex items-center gap-3">
                  <Target className="size-4 text-primary" /> Expertise par Genre
                </h3>
-               <div className="relative aspect-square flex items-center justify-center">
+                <div className="relative aspect-square flex items-center justify-center">
                   <div className="absolute inset-0 border-[1px] border-white/5 rounded-full"></div>
                   <div className="absolute inset-8 border-[1px] border-white/5 rounded-full"></div>
+                  <div className="absolute inset-16 border-[1px] border-white/5 rounded-full opacity-50"></div>
                   
-                  {/* Radar Mockup */}
-                  <svg className="size-full drop-shadow-[0_0_20px_rgba(140,43,238,0.3)]" viewBox="0 0 100 100">
-                    <polygon points="50,10 85,35 75,80 25,80 15,35" fill="rgba(140, 43, 238, 0.2)" stroke="#8c2bee" strokeWidth="2" />
+                  {/* Dynamic Radar Chart */}
+                  <svg className="size-full drop-shadow-[0_0_20px_rgba(140,43,238,0.4)] overflow-visible" viewBox="0 0 100 100">
+                    {/* Background Hexagon (Static) */}
+                    <polygon 
+                       points="50,10 88,38 74,82 26,82 12,38" 
+                       className="fill-white/5 stroke-white/10" 
+                       strokeWidth="1" 
+                    />
+                    {/* User Expertise Polygon (Dynamic) */}
+                    {(() => {
+                        const centerX = 50;
+                        const centerY = 50;
+                        // Calculate points based on expertiseData (5 axes: 90, 162, 234, 306, 18 degrees)
+                        const angles = [270, 342, 54, 126, 198]; // Adjust angles to match hexagon
+                        const points = expertiseData.map((d, i) => {
+                           const angle = (angles[i] * Math.PI) / 180;
+                           const r = (d.value / 100) * 40; // Max radius 40
+                           return `${centerX + r * Math.cos(angle)},${centerY + r * Math.sin(angle)}`;
+                        }).join(" ");
+                        
+                        return (
+                          <motion.polygon 
+                            initial={{ opacity: 0, scale: 0 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            points={points} 
+                            className="fill-primary/30 stroke-primary" 
+                            strokeWidth="2" 
+                          />
+                        );
+                    })()}
+
+                  {/* Nodes at each point */}
+                  {expertiseData.map((d, i) => {
+                      const centerX = 50;
+                      const centerY = 50;
+                      const angles = [270, 342, 54, 126, 198];
+                      const angle = (angles[i] * Math.PI) / 180;
+                      const r = (d.value / 100) * 40;
+                      return (
+                        <motion.circle 
+                          key={i}
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ delay: 1 + i * 0.1 }}
+                          cx={centerX + r * Math.cos(angle)} 
+                          cy={centerY + r * Math.sin(angle)} 
+                          r="1.5"
+                          className="fill-white shadow-[0_0_10px_white]"
+                        />
+                      );
+                  })}
                   </svg>
                   
-                  <span className="absolute -top-4 text-[9px] font-black text-white uppercase italic tracking-widest">Shonen</span>
-                  <span className="absolute -bottom-4 text-[9px] font-black text-white uppercase italic tracking-widest">Seinen</span>
-                  <span className="absolute top-1/2 -left-8 -translate-y-1/2 text-[9px] font-black text-white uppercase italic tracking-widest rotate-[-90deg]">Mecha</span>
-                  <span className="absolute top-1/2 -right-8 -translate-y-1/2 text-[9px] font-black text-white uppercase italic tracking-widest rotate-[90deg]">Slice</span>
+                  {/* Labels */}
+                  <span className="absolute top-1 text-[7px] md:text-[8px] font-black text-white uppercase italic tracking-widest">{expertiseData[0].label}</span>
+                  <span className="absolute top-[35%] -right-4 md:-right-6 text-[7px] md:text-[8px] font-black text-white uppercase italic tracking-widest">{expertiseData[1].label}</span>
+                  <span className="absolute bottom-2 -right-4 md:-right-6 text-[7px] md:text-[8px] font-black text-white uppercase italic tracking-widest">{expertiseData[2].label}</span>
+                  <span className="absolute bottom-2 -left-4 md:-left-6 text-[7px] md:text-[8px] font-black text-white uppercase italic tracking-widest">{expertiseData[3].label}</span>
+                  <span className="absolute top-[35%] -left-4 md:-left-6 text-[7px] md:text-[8px] font-black text-white uppercase italic tracking-widest">{expertiseData[4].label}</span>
                </div>
                <div className="flex flex-col gap-3">
                   <div className="flex justify-between items-center glass-card p-3 rounded-xl border-white/5 text-[10px]">

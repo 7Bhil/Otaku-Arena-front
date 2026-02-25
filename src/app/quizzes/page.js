@@ -90,7 +90,7 @@ export default function Quizzes() {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glass-card p-12 rounded-[40px] flex flex-col md:flex-row items-center gap-12 border-white/5 shadow-2xl relative overflow-hidden"
+            className="glass-card p-8 md:p-12 rounded-[40px] flex flex-col md:flex-row items-center gap-10 md:gap-12 border-white/5 shadow-2xl relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 size-96 bg-primary/20 blur-[120px] -mr-48 -mt-48"></div>
             
@@ -194,13 +194,13 @@ export default function Quizzes() {
                 )}
             </div>
 
-            <div className="relative z-10 flex flex-col items-center gap-4 bg-white/5 p-10 rounded-[40px] border border-white/10 backdrop-blur-sm">
-              <div className="size-20 bg-primary/20 rounded-3xl flex items-center justify-center text-primary shadow-xl border border-primary/20">
-                <Trophy className="size-10 fill-primary" />
+            <div className="relative z-10 flex flex-col items-center gap-4 bg-white/5 p-8 md:p-10 rounded-[40px] border border-white/10 backdrop-blur-sm w-full md:w-auto">
+              <div className="size-16 md:size-20 bg-primary/20 rounded-3xl flex items-center justify-center text-primary shadow-xl border border-primary/20">
+                <Trophy className="size-8 md:size-10 fill-primary" />
               </div>
               <div className="text-center">
                 <span className="block text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">XP Bonus Défi</span>
-                <span className="text-3xl font-black text-white italic uppercase tracking-tighter">+500 XP</span>
+                <span className="text-2xl md:text-3xl font-black text-white italic uppercase tracking-tighter">+500 XP</span>
               </div>
             </div>
           </motion.div>
@@ -314,9 +314,9 @@ function QuizPlayer({ sessionData, user, onClose, onComplete, initialStep = 0, i
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-black/90 backdrop-blur-xl overflow-y-auto"
     >
-      <div className="max-w-2xl w-full glass-card rounded-[40px] p-8 md:p-12 relative border-white/10 shadow-3xl">
+      <div className="max-w-2xl w-full glass-card rounded-[32px] md:rounded-[40px] p-6 md:p-12 relative border-white/10 shadow-3xl my-auto">
         <button 
           onClick={() => {
              // On ne supprime PLUS le progrès ici. 
@@ -331,12 +331,12 @@ function QuizPlayer({ sessionData, user, onClose, onComplete, initialStep = 0, i
 
         {!isFinished ? (
           <div className="space-y-12">
-            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.3em]">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em]">
               <div className="text-primary flex items-center gap-2">
-                <Brain className="size-3" /> Question {currentStep + 1} / {sessionData.questions.length}
+                <Brain className="size-4" /> Question {currentStep + 1} / {sessionData.questions.length}
               </div>
               {sessionData.questions[currentStep].animeTitle && (
-                <div className="text-white bg-primary/20 px-3 py-1.5 rounded-lg border border-primary/30 italic flex items-center gap-2 max-w-[250px]">
+                <div className="text-white bg-primary/20 px-3 py-1.5 rounded-lg border border-primary/30 italic flex items-center gap-2 max-w-full sm:max-w-[250px] truncate">
                   <Zap className="size-3 fill-primary" /> {sessionData.questions[currentStep].animeTitle}
                 </div>
               )}
@@ -379,14 +379,14 @@ function QuizPlayer({ sessionData, user, onClose, onComplete, initialStep = 0, i
               <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Tes résultats sont enregistrés dans l&apos;Arène</p>
             </div>
             
-            <div className="flex items-center justify-center gap-12">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-8 md:gap-12">
               <div className="flex flex-col gap-1">
-                <div className="text-5xl font-black text-white italic">{score} / {sessionData.questions.length}</div>
+                <div className="text-4xl md:text-5xl font-black text-white italic">{score} / {sessionData.questions.length}</div>
                 <div className="text-primary font-black uppercase tracking-[0.2em] text-[8px]">Bonnes Réponses</div>
               </div>
-              <div className="size-px h-12 bg-white/10"></div>
+              <div className="hidden sm:block size-px h-12 bg-white/10"></div>
               <div className="flex flex-col gap-1">
-                <div className="text-5xl font-black text-primary italic">+{xpGained}</div>
+                <div className="text-4xl md:text-5xl font-black text-primary italic">+{xpGained}</div>
                 <div className="text-slate-500 font-black uppercase tracking-[0.2em] text-[8px]">XP Gagnés</div>
               </div>
             </div>

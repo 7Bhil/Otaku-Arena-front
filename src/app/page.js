@@ -35,12 +35,12 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative pt-32 pb-20 overflow-hidden min-h-screen">
+    <div className="relative pt-24 md:pt-32 pb-16 md:pb-20 overflow-hidden min-h-screen">
       <div className="absolute inset-0 hero-glow -z-10"></div>
       
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         {/* Hero Section */}
-        <div className="flex flex-col lg:flex-row items-center gap-16 mb-32">
+        <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16 mb-24 md:mb-32">
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -54,8 +54,8 @@ export default function Home() {
               Saison 4 en cours
             </div>
             
-            <h1 className="text-6xl lg:text-8xl font-black tracking-tight leading-[0.9] text-white uppercase">
-              L&apos;ARÈNE <br />
+            <h1 className="text-5xl md:text-6xl lg:text-8xl font-black tracking-tight leading-[0.9] text-white uppercase">
+              L&apos;ARÈNE <br className="hidden sm:block" />
               <span className="text-transparent bg-clip-text premium-gradient">ANIME ULTIME.</span>
             </h1>
             
@@ -104,7 +104,7 @@ export default function Home() {
             animate={{ opacity: 1, scale: 1 }}
             className="flex-1 w-full max-w-xl"
           >
-            <div className="relative grid grid-cols-2 gap-4 p-4 glass-card rounded-2xl overflow-hidden">
+            <div className="relative grid grid-cols-1 md:grid-cols-2 gap-4 p-4 glass-card rounded-2xl overflow-hidden">
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
                 <div className="vs-badge size-16 rounded-full border-4 border-background flex items-center justify-center shadow-2xl">
                   <span className="text-white font-black italic text-2xl tracking-tighter">VS</span>
@@ -112,10 +112,10 @@ export default function Home() {
               </div>
               
               {loading ? (
-                <div className="col-span-2 h-[450px] flex items-center justify-center text-slate-500 italic font-medium">Chargement des challengers...</div>
+                <div className="col-span-2 h-[300px] md:h-[450px] flex items-center justify-center text-slate-500 italic font-medium">Chargement des challengers...</div>
               ) : (
                 featuredCharacters.map((char, idx) => char && (
-                  <div key={idx} className="group relative h-[450px] rounded-xl overflow-hidden cursor-pointer border border-white/5">
+                  <div key={idx} className="group relative h-[300px] md:h-[450px] rounded-xl overflow-hidden cursor-pointer border border-white/5">
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10"></div>
                     <Image 
                       src={char.images.webp.image_url} 
@@ -137,8 +137,8 @@ export default function Home() {
         </div>
 
         {/* Leaderboard Snippet */}
-        <section className="mb-32">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-16 items-center">
+        <section className="mb-24 md:mb-32">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-16 items-center">
             <div className="lg:col-span-2 flex flex-col gap-6">
               <h2 className="text-4xl md:text-5xl font-black text-white leading-tight uppercase tracking-tighter italic">
                 LEADERS DU <br /> <span className="text-primary italic">MASH ACTUEL</span>
